@@ -42,9 +42,14 @@ def make_git_repo(repo_dir: Path, pyproject_name: str, version=None, dependencie
 
     make_pyproject(repo_dir, pyproject_name, version, dependencies, file_tree)
 
-    subprocess.check_call(["git", "init"], cwd=repo_dir)
-    subprocess.check_call(["git", "add", "."], cwd=repo_dir)
-    subprocess.check_call(["git", "commit", "-m", "Initial commit"], cwd=repo_dir)
+    for cmd in (
+        ["git", "init"],
+        ["git", "config", "--local", "--add", "user.name", "tester"],
+        ["git", "config", "--local", "--add", "user.email", "tester@testing.tst"],
+        ["git", "add", "."],
+        ["git", "commit", "-m", "Initial commit"]
+    ):
+        subprocess.check_call(cmd, cwd=repo_dir)
 
     logging.info(f"Created git repository at '{repo_dir}' with project '{pyproject_name}'")
 

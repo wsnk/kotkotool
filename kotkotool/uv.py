@@ -2,10 +2,9 @@ import subprocess
 import tomllib
 from pathlib import Path
 from dataclasses import dataclass
-import os
 import json
 import asyncio
-from .log import dbg, inf, err
+from .log import dbg, err
 from .proc import run, ToFile, run_async
 
 
