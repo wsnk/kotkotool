@@ -1,6 +1,7 @@
 import subprocess
+import asyncio
 from contextlib import contextmanager
-from .log import dbg, inf, err
+from .log import dbg, inf, err, wrn
 
 
 class ToFile:
@@ -57,15 +58,14 @@ def run(cmd, *, stdout=None, stderr=None, **kwargs):
     dbg("Command output:\n%s", result.stdout)
     return result
 
-async def run_async(cmd, *, stdout=None, stderr=None, text=False, **kwargs) -> subprocess.CompletedProcess:
-    import asyncio
 
+async def run_async(cmd, *, stdout=None, stderr=None, text=False, noexcept=False, **kwargs) -> subprocess.CompletedProcess:
     dbg("Running subprocess command: %s", cmd)
 
     with (
         _prepare_output(stdout) as stdout,
         _prepare_output(stderr) as stderr
-    ):
+    ):  #
         proc = await asyncio.create_subprocess_exec(
             *cmd,
             **kwargs,
@@ -73,20 +73,22 @@ async def run_async(cmd, *, stdout=None, stderr=None, text=False, **kwargs) -> s
             stdout=stdout,
             stderr=stderr,
         )
-        dbg("Started subprocess: PID=%d", proc.pid)
+        dbg("Subprocess started: prog='%s', PID=%d...", cmd[0], proc.pid)
         stdout_data, stderr_data = await proc.communicate()
 
-        dbg("Subprocess completed: PID=%d, code=%d", proc.pid, proc.returncode)
+        dbg("Subprocess completed: prog='%s', PID=%d, code=%d", cmd[0], proc.pid, proc.returncode)
 
         if text:
             stdout_data = stdout_data.decode() if stdout_data else ""
             stderr_data = stderr_data.decode() if stderr_data else ""
 
         if proc.returncode != 0:
-            err("Subprocess failed: PID=%s, stderr=%s", proc.pid, stderr_data)
-            raise RuntimeError(f"Subprocess failed with exit code {proc.returncode}")
-
-        inf("Subprocess sucessfully completed: PID=%d, stdout=%s", proc.pid, stdout_data)
+            if not noexcept:
+                raise subprocess.CalledProcessError(proc.returncode, cmd[0], stdout_data, stderr_data)
+            err(
+                "Subprocess failed: prog='%s', PID=%d, code=%d, stderr='%s'",
+                cmd[0], proc.pid, proc.returncode, stderr_data
+            )
 
         return subprocess.CompletedProcess(
             args=cmd,
