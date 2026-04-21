@@ -44,7 +44,7 @@ def make_git_repo(repo_dir: Path, pyproject_name: str, version=None, dependencie
 
     for cmd in (
         ["git", "init"],
-        ["git", "config", "--local", "--add", "user.namer", "tester"],
+        ["git", "config", "--local", "--add", "user.name", "tester"],
         ["git", "config", "--local", "--add", "user.email", "tester@testing.tst"],
         ["git", "add", "."],
         ["git", "commit", "-m", "Initial commit"]
