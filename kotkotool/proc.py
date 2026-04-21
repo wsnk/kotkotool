@@ -1,7 +1,7 @@
 import subprocess
 import asyncio
 from contextlib import contextmanager
-from .log import dbg, inf, err, wrn
+from .log import dbg, err
 
 
 class ToFile:

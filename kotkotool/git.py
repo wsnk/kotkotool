@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from .proc import run_async
-from .log import dbg, inf, err
+from .log import dbg, inf
 from dataclasses import dataclass, field
 
 
