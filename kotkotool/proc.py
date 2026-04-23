@@ -96,3 +96,20 @@ async def run_async(cmd, *, stdout=None, stderr=None, text=False, noexcept=False
             stdout=stdout_data,
             stderr=stderr_data
         )
+
+
+async def run_many_tasks(coros, *, max_concurrency=None):
+    """Run multiple async tasks with limited concurrency.
+    """
+
+    if max_concurrency is None:
+        return await asyncio.gather(*coros)
+
+    semaphore = asyncio.Semaphore(max_concurrency)
+
+    async def sem_task(coro):
+        async with semaphore:
+            return await coro
+
+    return await asyncio.gather(*(sem_task(coro) for coro in coros))
+

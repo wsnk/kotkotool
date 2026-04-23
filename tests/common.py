@@ -43,7 +43,7 @@ def make_git_repo(repo_dir: Path, pyproject_name: str, version=None, dependencie
     make_pyproject(repo_dir, pyproject_name, version, dependencies, file_tree)
 
     for cmd in (
-        ["git", "init"],
+        ["git", "init", "--initial-branch=master"],
         ["git", "config", "--local", "--add", "user.name", "tester"],
         ["git", "config", "--local", "--add", "user.email", "tester@testing.tst"],
         ["git", "add", "."],
