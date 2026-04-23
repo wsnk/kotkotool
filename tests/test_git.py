@@ -1,6 +1,6 @@
 import pytest
 from .common import make_git_repo
-from kotkotool.git import GitRepository, RemoteRepository
+from kotkotool.git import GitRepository
 
 
 @pytest.fixture(scope="module")

@@ -1,9 +1,8 @@
 import subprocess
 from pathlib import Path
-from .proc import run_async, run_many_tasks
+from .proc import run_async
 from .log import dbg, inf
 from dataclasses import dataclass, field
-from typing import Literal
 
 
 def parse_remotes(output: str):
