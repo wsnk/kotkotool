@@ -99,13 +99,16 @@ class GitRepository:
         return repo
 
     @classmethod
-    async def ensure_repo(cls, dest_dir: Path, *, initial_branch="master", origin=None):
+    async def ensure_repo(cls, dest_dir: Path, *, initial_branch=None, origin=None):
         dest_dir.mkdir(parents=True, exist_ok=True)
 
         repo = cls(dest_dir)
 
         if not repo.is_repository():
-            await repo.run(["init", "."])
+            args = ["init", "."]
+            if initial_branch is not None:
+                args += ["-b", initial_branch]
+            await repo.run(args)
 
         if origin is not None:
             await repo.remotes.set_remote(origin)
@@ -171,10 +174,5 @@ class GitRepository:
         ])
 
     async def get_commit_hash(self) -> str:
-        result = await run_async(
-            ["git", "rev-parse", "HEAD"],
-            cwd=self.repo_dir,
-            stdout=subprocess.PIPE,
-            text=True
-        )
+        result = await self.run(["rev-parse", "HEAD"], stdout=subprocess.PIPE, text=True)
         return result.stdout.strip()

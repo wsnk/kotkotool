@@ -71,6 +71,21 @@ async def test_clone_git_repository(git_repo_dir: str, tmp_path):
     await repo.get_commit_hash()  # no exception means the repository is valid
 
 
+async def test_ensure_repo__already_exists(git_repo_dir: str):
+    head_commit = await GitRepository(git_repo_dir).get_commit_hash()
+
+    repo = await GitRepository.ensure_repo(git_repo_dir)
+    assert (await repo.get_commit_hash()) == head_commit
+
+
+async def test_ensure_repo__init_new(tmp_path):
+    repo_dir = tmp_path / "new-repo"
+    repo = await GitRepository.ensure_repo(repo_dir, initial_branch="master")
+
+    assert repo.repo_dir.exists()
+
+
+
 async def test_ensure_git_repository(git_repo_dir: str, tmp_path):
     url = f"file://{git_repo_dir}"
     dest_dir = tmp_path / "a-repo"
